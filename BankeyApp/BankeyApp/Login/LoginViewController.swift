@@ -7,6 +7,12 @@
 
 import UIKit
 
+protocol LoginViewControllerDelegate: AnyObject {
+//    func didLogin(_ sender: LoginViewController) // pass data
+    func didLogin()
+}
+
+
 class LoginViewController: UIViewController {
     
     let titleLabel = UILabel()
@@ -24,6 +30,9 @@ class LoginViewController: UIViewController {
     
     var username: String? { return loginView.userNameTextField.text }
     var password: String? { return loginView.passwordTextField.text }
+    
+    weak var delegate: LoginViewControllerDelegate?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         style()
@@ -55,7 +64,7 @@ extension LoginViewController {
         titleLabel.font = UIFont.preferredFont(forTextStyle: .largeTitle)
         titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.text = "Bankey"
-        titleLabel.alpha = 0
+//        titleLabel.alpha = 0
         
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         subtitleLabel.textAlignment = .center
@@ -63,15 +72,16 @@ extension LoginViewController {
         subtitleLabel.adjustsFontForContentSizeCategory = true
         subtitleLabel.numberOfLines = 0
         subtitleLabel.text = "Your premium source for all things banking!"
-        subtitleLabel.alpha = 0
+//        subtitleLabel.alpha = 0
     }
     
     private func layout(){
+        view.addSubview(titleLabel)
+        view.addSubview(subtitleLabel)
         view.addSubview(loginView)
         view.addSubview(signInButton)
         view.addSubview(errorMessageLabel)
-        view.addSubview(titleLabel)
-        view.addSubview(subtitleLabel)
+        
         
         // LoginView
         NSLayoutConstraint.activate([
@@ -94,20 +104,15 @@ extension LoginViewController {
         // TitleLabel
         NSLayoutConstraint.activate([
             subtitleLabel.topAnchor.constraint(equalToSystemSpacingBelow: titleLabel.bottomAnchor, multiplier: 3),
-            titleLabel.trailingAnchor.constraint(equalTo: loginView.trailingAnchor)
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
-        
-        titleLeadingAnchor = titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leadingEdgeOffScreen)
-        titleLeadingAnchor?.isActive = true
         
         // SubtitleLabel
         NSLayoutConstraint.activate([
             loginView.topAnchor.constraint(equalToSystemSpacingBelow: subtitleLabel.bottomAnchor, multiplier: 3),
+            subtitleLabel.leadingAnchor.constraint(equalTo: loginView.leadingAnchor),
             subtitleLabel.trailingAnchor.constraint(equalTo: loginView.trailingAnchor)
         ])
-        
-        subtitleLeadingAnchor = subtitleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leadingEdgeOffScreen)
-        subtitleLeadingAnchor?.isActive = true
     }
 }
 
@@ -128,6 +133,7 @@ extension LoginViewController {
         }
         if username == "Mike" && password == "1234" {
             signInButton.configuration?.showsActivityIndicator = true
+            delegate?.didLogin()
         } else {
             configureView(withMessage: "Incorrect username / password")
         }
